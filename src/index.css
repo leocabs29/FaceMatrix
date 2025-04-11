@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+
+:root {
+  --font-secondary: 'Poppins', 'serif';
+}
