@@ -6,8 +6,4 @@ import svgr from 'vite-plugin-svgr'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), svgr()],
-  server: {
-    host: '0.0.0.0',   // ← expose to your local network
-    port: 5173         // ← optional, just to be clear
-  }
 })
