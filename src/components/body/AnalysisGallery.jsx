@@ -12,7 +12,7 @@ function AnalysisGallery() {
     const [imgname, setImgname] = useState("imgname");
     const [showRename , setShowRename] = useState(false);
     const emotion = [
-          { icon: happy, mood: "Happy", number: 1 },
+          { icon: happy, mood: "Happy", number: 0.0 },
         { icon: neutral, mood: "Neutral", number: 0.0 },
         { icon: sad, mood: "Sad", number: 0.0 },
         { icon: surprised, mood: "Surprised", number: 0.0 },
@@ -24,7 +24,7 @@ function AnalysisGallery() {
     <div className="w-1/4 ">
         <div className="w-full  h-full border border-gray-100  ">
 
-        <div className="w-full  flex justify-between p-4 w-full relative">
+        <div className="  flex justify-between p-4 w-full relative">
             <span className="font-secondary font-bold text-sky-900 text-lg  lg:text-lg">imgname</span>
             <MoreVertIcon/>
         </div>
