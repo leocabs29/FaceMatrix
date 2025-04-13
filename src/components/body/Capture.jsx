@@ -8,7 +8,7 @@ function Capture() {
   const [captures, setCaptures] = useState([]);
   const [zoomedImage, setZoomedImage] = useState(null);
   const [clickTimeouts, setClickTimeouts] = useState({});
-
+ 
   useEffect(() => {
     const storedCaptures = JSON.parse(localStorage.getItem("captures")) || [];
     // Add `selected: false` to each capture
