@@ -253,7 +253,7 @@ function Camera() {
 
       {/* Camera Preview */}
       <div className="flex-1 bg-slate-100 flex flex-col justify-center items-center p-4 space-y-4">
-        <div className="relative w-full h-[600px] lg:h-[600px]">
+        <div className="relative w-full h-[600px] lg:h-[400px]">
           <video
             ref={videoRef}
             autoPlay
