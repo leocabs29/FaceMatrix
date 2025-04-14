@@ -162,9 +162,6 @@ function Camera() {
     });
   };
 
-  // Function to capture the current frame and save it to localStorage
- 
-
   const captureImageAndEmotion = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -181,14 +178,14 @@ function Camera() {
         JSON.parse(localStorage.getItem("captures")) || [];
 
       // Generate a unique ID using timestamp
-      const uniqueId = Date.now(); // You could use UUID too if needed
+      const uniqueId = Date.now();
 
       // Sum emotions across all detected faces
       const emotion =
         allExpressions.length > 0 ? getEmotionData(allExpressions) : null;
 
       const newCapture = {
-        id: uniqueId, // ✅ Add this line
+        id: uniqueId,
         image: imageData,
         emotion: emotion,
       };
@@ -205,15 +202,13 @@ function Camera() {
   return (
     <div className="flex flex-col lg:flex-row w-full min-h-screen">
       {/* Analysis Panel */}
-      <div className="w-full lg:w-1/4 border border-gray-100 p-4">
-        <p className="font-secondary text-sky-900 text-xl text-center font-bold mb-4">
+      <div className="w-full lg:w-1/4 p-4 bg-white border border-gray-200">
+        <p className="text-center font-semibold text-xl text-sky-900 mb-4">
           Analysis
         </p>
 
         {allExpressions.length === 0 ? (
-          <p className="text-center text-gray-400 font-secondary">
-            No face detected
-          </p>
+          <p className="text-center text-gray-400">No face detected</p>
         ) : (
           <div className="space-y-4">
             <p className="text-center text-sm font-semibold text-sky-700 mb-2">
@@ -226,21 +221,18 @@ function Camera() {
                   Face #{idx + 1}
                 </p>
                 {getEmotionData([expressions]).map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex justify-between  space-y-4 items-center px-2 py-1"
-                  >
+                  <div key={i} className="flex justify-between items-center py-2 px-4">
                     <div className="flex items-center space-x-2">
                       <img
                         src={item.icon}
-                        className="w-5 lg:w-6"
+                        className="w-6 h-6"
                         alt={item.mood}
                       />
-                      <span className="font-secondary font-bold text-sky-900 text-xs lg:text-sm">
+                      <span className="text-sm font-bold text-sky-900">
                         {item.mood}
                       </span>
                     </div>
-                    <span className="font-secondary font-bold text-sky-900 text-sm">
+                    <span className="text-sm font-bold text-sky-900">
                       {item.number}
                     </span>
                   </div>
@@ -253,20 +245,20 @@ function Camera() {
 
       {/* Camera Preview */}
       <div className="flex-1 bg-slate-100 flex flex-col justify-center items-center p-4 space-y-4">
-        <div className="relative w-full h-[600px] lg:h-[400px]">
+        <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px] xl:w-[700px]">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className="w-full h-full object-contain rounded-lg"
+            className="w-full h-full object-cover rounded-lg"
           />
           <canvas
             ref={canvasRef}
             className="absolute top-0 left-0 w-full h-full -scale-x-100"
           />
         </div>
-        <div className="space-x-2 flex items-center justify-center">
+        <div className="space-x-4 flex items-center justify-center">
           <img
             src={cameraButton}
             className="w-12 sm:w-16 p-2 cursor-pointer"
@@ -280,7 +272,6 @@ function Camera() {
           />
         </div>
       </div>
-      <Toaster />
     </div>
   );
 }
