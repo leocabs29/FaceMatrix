@@ -82,7 +82,7 @@ function Capture() {
       }
       return 0;
     });
-
+ 
   return (
     <div className="bg-gradient-to-r bg-slate-100 w-full p-8 flex flex-col h-screen">
       <div className="w-full flex justify-between items-center mb-6">
