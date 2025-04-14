@@ -9,6 +9,7 @@ import surprised from "../../assets/surprised.png";
 import disgust from "../../assets/disgust.png";
 import toast, { Toaster } from "react-hot-toast";
 import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
+
 const EMOTIONS = [
   { icon: happy, mood: "Happy" },
   { icon: neutral, mood: "Neutral" },
@@ -76,6 +77,7 @@ function Camera() {
         console.error("Error accessing webcam:", err);
       });
   };
+
   const switchCamera = () => {
     const newCamera = currentCamera === "user" ? "environment" : "user";
     setCurrentCamera(newCamera);
@@ -161,14 +163,7 @@ function Camera() {
   };
 
   // Function to capture the current frame and save it to localStorage
-  const captureImage = () => {
-    const canvas = canvasRef.current;
-    const imageURL = canvas.toDataURL("image/png");
-
-    // Save the captured image in localStorage
-    localStorage.setItem("capturedImage", imageURL);
-    console.log("Image saved to localStorage!");
-  };
+ 
 
   const captureImageAndEmotion = () => {
     const video = videoRef.current;
@@ -258,23 +253,23 @@ function Camera() {
 
       {/* Camera Preview */}
       <div className="flex-1 bg-slate-100 flex flex-col justify-center items-center p-4 space-y-4">
-        <div className="relative w-full h-[600px]">
+        <div className="relative w-full h-[600px] lg:h-[600px]">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className="w-full h-full object-contain rounded-lg "
+            className="w-full h-full object-contain rounded-lg"
           />
           <canvas
             ref={canvasRef}
             className="absolute top-0 left-0 w-full h-full -scale-x-100"
           />
         </div>
-        <div className="space-x-2 flex items-center">
+        <div className="space-x-2 flex items-center justify-center">
           <img
             src={cameraButton}
-            className="w-16 p-2 cursor-pointer"
+            className="w-12 sm:w-16 p-2 cursor-pointer"
             onClick={captureImageAndEmotion}
             alt="Capture"
           />
