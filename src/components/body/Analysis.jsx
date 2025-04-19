@@ -20,7 +20,7 @@ function Analysis({ emotions }) {
 
   return (
     <div className="w-1/4 border border-gray-100">
-      <p className="font-secondary text-sky-900 lg:text-xl p-4 text-center font-bold">Analysis</p>
+      <p className="font-secondary text-[#01384D] lg:text-xl p-4 text-center font-bold">Analysis</p>
       <div>
         {emotion.map((item, index) => (
           <div key={index} className="flex justify-between p-4 mb-2">
