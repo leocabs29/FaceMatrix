@@ -45,7 +45,7 @@ function Capture() {
     // Make an API request to delete selected images
     const idsToDelete = selectedCaptures.map((capture) => capture._id);
 
-    fetch("http://localhost:5000/api/images/delete", {
+    fetch("http://localhost:5000/api/images/images/delete", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
