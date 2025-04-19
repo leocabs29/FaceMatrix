@@ -186,7 +186,7 @@ function Nav() {
               whileTap="tap"
               className="rounded-lg"
             >
-              <Link to={"/"} className="text-sm block w-full px-4 py-2">
+              <Link to={"/home"} className="text-sm block w-full px-4 py-2">
                 Camera
               </Link>
             </motion.div>

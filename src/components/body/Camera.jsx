@@ -20,7 +20,8 @@ const EMOTIONS = [
   { icon: disgust, mood: "Disgust", color: "bg-green-100" },
 ];
 
-function Camera() {
+
+function Camera() { // Add userId as a prop
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const intervalRef = useRef(null);
@@ -29,6 +30,8 @@ function Camera() {
   const [currentCamera, setCurrentCamera] = useState("user"); // 'user' (front) or 'environment' (back)
   const [cameraActive, setCameraActive] = useState(false);
   const [loadingModels, setLoadingModels] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  let userId = localStorage.getItem('userId');
 
   const updateExpressions = useCallback(
     (detections) => {
@@ -201,7 +204,41 @@ function Camera() {
     }).sort((a, b) => b.number - a.number); // Sort by highest emotion
   };
 
-  const captureImageAndEmotion = () => {
+  // New function to upload image data to the server
+  const uploadImageToServer = async (captureData) => {
+    try {
+      setIsUploading(true);
+      console.log("my user id : " + userId)
+      const response = await fetch('http://localhost:5000/api/images/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          id: captureData.id,
+          image: captureData.image, // Ensure this is a valid base64 string
+          timestamp: captureData.timestamp,
+          dominantEmotion: captureData.dominantEmotion,
+          emotion: captureData.emotion
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to upload image');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const captureImageAndEmotion = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     
@@ -211,7 +248,7 @@ function Camera() {
     }
     
     const context = canvas.getContext("2d");
-
+  
     if (video.readyState === 4) {
       // Video is fully loaded
       canvas.width = video.videoWidth;
@@ -226,21 +263,18 @@ function Camera() {
       } else {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
       }
-
+  
       const imageData = canvas.toDataURL("image/png");
-      const existingCaptures =
-        JSON.parse(localStorage.getItem("captures")) || [];
-
+  
       // Generate a unique ID using timestamp
       const uniqueId = Date.now();
-
+  
       // Sum emotions across all detected faces
-      const emotion =
-        allExpressions.length > 0 ? getEmotionData(allExpressions) : null;
-
+      const emotion = allExpressions.length > 0 ? getEmotionData(allExpressions) : null;
+  
       // Get dominant emotion
       const dominantEmotion = emotion && emotion.length > 0 ? emotion[0].mood : "Unknown";
-
+  
       const newCapture = {
         id: uniqueId,
         image: imageData,
@@ -248,28 +282,21 @@ function Camera() {
         timestamp: new Date().toISOString(),
         dominantEmotion: dominantEmotion
       };
-
-      existingCaptures.push(newCapture);
-      localStorage.setItem("captures", JSON.stringify(existingCaptures));
-
-      // Create animation effect for capture
-      const flashEffect = document.createElement('div');
-      flashEffect.className = 'fixed inset-0 bg-white z-50';
-      flashEffect.style.opacity = '0.8';
-      document.body.appendChild(flashEffect);
-      
-      setTimeout(() => {
-        flashEffect.style.opacity = '0';
-        flashEffect.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => {
-          document.body.removeChild(flashEffect);
-        }, 500);
-      }, 100);
-
-      toast.success(`Captured! Dominant emotion: ${dominantEmotion}`, {
-        icon: '📸',
-        duration: 3000
-      });
+  
+      // Upload to server directly without saving to local storage
+      try {
+        const loadingToast = toast.loading('Uploading to server...');
+        await uploadImageToServer(newCapture);
+        toast.dismiss(loadingToast);
+        toast.success(`Captured and uploaded! Emotion: ${dominantEmotion}`, {
+          icon: '📸',
+          duration: 3000
+        });
+      } catch (error) {
+        toast.error(`Failed to upload: ${error.message}`, {
+          duration: 5000
+        });
+      }
     } else {
       toast.error("Video not ready. Try again in a moment.");
     }
@@ -279,9 +306,6 @@ function Camera() {
     <div className="flex flex-col lg:flex-row w-full min-h-screen bg-gray-50">
       <Toaster position="top-center" />
       
-    
-      
-
       <div className="flex flex-col lg:flex-row w-full">
         {/* Analysis Panel */}
         <motion.div 
@@ -391,6 +415,12 @@ function Camera() {
                 </div>
               </div>
             )}
+            {isUploading && (
+              <div className="absolute top-4 right-4 bg-white bg-opacity-90 rounded-lg p-3 z-10 flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm font-medium text-teal-800">Uploading...</span>
+              </div>
+            )}
             <video
               ref={videoRef}
               autoPlay
@@ -414,9 +444,9 @@ function Camera() {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="bg-white p-3 rounded-full shadow-lg"
+              className={`bg-white p-3 rounded-full shadow-lg ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={captureImageAndEmotion}
-              disabled={loadingModels || allExpressions.length === 0}
+              disabled={loadingModels || allExpressions.length === 0 || isUploading}
             >
               <img
                 src={cameraButton}
@@ -428,9 +458,9 @@ function Camera() {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="bg-white p-3 rounded-full shadow-lg"
+              className={`bg-white p-3 rounded-full shadow-lg ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={switchCamera}
-              disabled={loadingModels}
+              disabled={loadingModels || isUploading}
             >
               <CameraswitchIcon fontSize="medium" className="text-teal-800" />
             </motion.button>

@@ -9,20 +9,65 @@ function Capture() {
   const [zoomedImage, setZoomedImage] = useState(null);
   const [selectionMode, setSelectionMode] = useState(false);
   const [filterEmotion, setFilterEmotion] = useState("All");
-
+  let userId = localStorage.getItem('userId')
   useEffect(() => {
-    const storedCaptures = JSON.parse(localStorage.getItem("captures")) || [];
-    const updatedCaptures = storedCaptures.map((c) => ({
-      ...c,
-      selected: false,
-    }));
-    setCaptures(updatedCaptures);
-  }, []);
+    const fetchUserImages = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/images/user/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch images');
+        }
+        const images = await response.json();
+        const updatedCaptures = images.map((c) => ({
+          ...c,
+          selected: false,
+        }));
+        setCaptures(updatedCaptures);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+        toast.error("Error fetching images. Please try again.");
+      }
+    };
+
+    fetchUserImages();
+  }, [userId]);
+
+
+
+  const handleDeleteSelected = () => {
+    const selectedCaptures = captures.filter((c) => c.selected);
+    
+    if (selectedCaptures.length === 0) {
+      toast.error("No images selected to delete.");
+      return;
+    }
+
+    // Make an API request to delete selected images
+    const idsToDelete = selectedCaptures.map((capture) => capture._id);
+
+    fetch("http://localhost:5000/api/images/delete", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: idsToDelete }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Update captures to remove the deleted ones
+        const remainingCaptures = captures.filter((c) => !c.selected);
+        setCaptures(remainingCaptures);
+        toast.success(`${data.message}`);
+      })
+      .catch((error) => {
+        console.error("Error deleting images:", error);
+        toast.error("Error deleting images. Please try again.");
+      });
+  };
 
   const handleDeleteAll = () => {
-    toast.success("Deleted")
+    toast.success("Deleted");
     const remainingCaptures = captures.filter((c) => !c.selected);
-    localStorage.setItem("captures", JSON.stringify(remainingCaptures));
     setCaptures(remainingCaptures);
   };
 
@@ -286,8 +331,8 @@ function Capture() {
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <IconButton 
-              onClick={handleDeleteAll}
-              className="transition-all duration-300 ease-in-out hover:bg-sky-500 hover:text-white"
+              onClick={handleDeleteSelected}
+              className="transition-all duration-300 ease-in-out hover:bg-sky-500 hover:text-red-400"
             >
               <DeleteIcon />
             </IconButton>
