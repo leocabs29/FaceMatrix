@@ -13,7 +13,7 @@ function Capture() {
   useEffect(() => {
     const fetchUserImages = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/images/user/${userId}`);
+        const response = await fetch(`https://facematrix.vercel.app/images/user/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch images');
         }
