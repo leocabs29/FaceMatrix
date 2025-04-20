@@ -209,7 +209,7 @@ function Camera() { // Add userId as a prop
     try {
       setIsUploading(true);
       console.log("my user id : " + userId)
-      const response = await fetch('http://localhost:5000/api/images/upload', {
+      const response = await fetch('http://localhost:5000/images/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

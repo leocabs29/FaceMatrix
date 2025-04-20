@@ -13,7 +13,7 @@ function Capture() {
   useEffect(() => {
     const fetchUserImages = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/images/user/${userId}`);
+        const response = await fetch(`http://localhost:5000/images/user/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch images');
         }
@@ -45,7 +45,7 @@ function Capture() {
     // Make an API request to delete selected images
     const idsToDelete = selectedCaptures.map((capture) => capture._id);
 
-    fetch("http://localhost:5000/api/images/images/delete", {
+    fetch("http://localhost:5000/images/delete", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
